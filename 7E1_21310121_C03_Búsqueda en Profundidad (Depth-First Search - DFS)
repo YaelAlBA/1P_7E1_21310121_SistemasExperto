@@ -1,0 +1,48 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+def dfs_habitaciones(casa, habitacion_actual, habitacion_buscada, visitadas=None):
+    if visitadas is None:
+        visitadas = set()  # Conjunto para habitaciones ya visitadas
+
+    # Marcar la habitación actual como visitada
+    print(f"Explorando: {habitacion_actual}")
+    visitadas.add(habitacion_actual)
+
+    # Si encontramos la habitación buscada, terminamos la búsqueda
+    if habitacion_actual == habitacion_buscada:
+        print(f"¡Habitación {habitacion_buscada} encontrada!")
+        return True
+
+    # Explorar habitaciones conectadas
+    for habitacion_vecina in casa[habitacion_actual]:
+        if habitacion_vecina not in visitadas:
+            if dfs_habitaciones(casa, habitacion_vecina, habitacion_buscada, visitadas):
+                return True
+
+    # Si no encontramos la habitación, devolvemos False
+    return False
+
+# Ejemplo de una casa con habitaciones conectadas
+casa = {
+    'Entrada': ['Sala', 'Cocina'],
+    'Sala': ['Habitación 1', 'Habitación 2'],
+    'Cocina': ['Baño'],
+    'Habitación 1': [],
+    'Habitación 2': ['Habitación 3'],
+    'Baño': [],
+    'Habitación 3': []
+}
+
+# Buscar una habitación específica
+habitacion_buscada = 'Habitación 3'
+
+# Iniciar DFS desde la 'Entrada'
+encontrada = dfs_habitaciones(casa, 'Entrada', habitacion_buscada)
+
+if not encontrada:
+    print(f"¡Habitación {habitacion_buscada} no encontrada en la casa!")
