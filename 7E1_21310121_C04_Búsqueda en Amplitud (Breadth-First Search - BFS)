@@ -1,0 +1,49 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+from collections import deque
+
+def bfs(casa, habitacion_inicial, habitacion_buscada):
+    # Crear una cola para mantener las habitaciones por explorar
+    cola = deque([habitacion_inicial])
+    visitadas = set([habitacion_inicial])
+
+    while cola:
+        habitacion_actual = cola.popleft()
+        print(f"Explorando: {habitacion_actual}")
+
+        # Si encontramos la habitación buscada, terminamos
+        if habitacion_actual == habitacion_buscada:
+            print(f"¡Habitación {habitacion_buscada} encontrada!")
+            return True
+
+        # Explorar las habitaciones conectadas no visitadas
+        for habitacion_vecina in casa[habitacion_actual]:
+            if habitacion_vecina not in visitadas:
+                visitadas.add(habitacion_vecina)
+                cola.append(habitacion_vecina)
+
+    # Si no encontramos la habitación, devolvemos False
+    print(f"¡Habitación {habitacion_buscada} no encontrada!")
+    return False
+
+# Ejemplo de una casa o edificio con habitaciones conectadas
+casa = {
+    'Entrada': ['Sala', 'Cocina'],
+    'Sala': ['Habitación 1', 'Habitación 2'],
+    'Cocina': ['Baño'],
+    'Habitación 1': [],
+    'Habitación 2': ['Habitación 3'],
+    'Baño': [],
+    'Habitación 3': []
+}
+
+# Buscar una habitación específica
+habitacion_buscada = 'Baño'
+
+# Iniciar BFS desde la 'Entrada'
+bfs(casa, 'Entrada', habitacion_buscada)
