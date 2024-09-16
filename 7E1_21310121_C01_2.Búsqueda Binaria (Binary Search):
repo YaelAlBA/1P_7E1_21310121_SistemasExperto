@@ -1,0 +1,38 @@
+
+#SISTEMAS EXPERTOS
+#Alumno:Yael Alejandro Aldana Barajas
+#Registro:21310121
+#Grupo: 7E1
+#Profesor:Mauricio Alejandro Cabrera Arellano 
+
+
+def buscar_nombre_agenda(agenda, nombre_buscado):
+    # Definir los límites iniciales
+    inicio = 0
+    fin = len(agenda) - 1
+
+    while inicio <= fin:
+        # Calcular el punto medio
+        medio = (inicio + fin) // 2
+        nombre_medio = agenda[medio]
+
+        # Comparar el nombre del medio con el nombre buscado
+        if nombre_medio == nombre_buscado:
+            return medio  # Devuelve el índice si el nombre es encontrado
+        elif nombre_medio > nombre_buscado:
+            fin = medio - 1  # Ajustamos el límite superior
+        else:
+            inicio = medio + 1  # Ajustamos el límite inferior
+
+    return -1  # Si no encontramos el nombre
+
+# Ejemplo de uso
+agenda = ["Ana", "Carlos", "Elena", "Javier", "María", "Roberto", "Sofía"]
+nombre_buscado = "María"
+
+resultado = buscar_nombre_agenda(agenda, nombre_buscado)
+
+if resultado != -1:
+    print(f"{nombre_buscado} está en la agenda en el índice {resultado}.")
+else:
+    print(f"{nombre_buscado} no está en la agenda.")
