@@ -1,0 +1,70 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+import heapq
+
+# Función heurística: estimación de la distancia en línea recta (distancia de Manhattan)
+def heuristica(nodo, objetivo):
+    x1, y1 = nodo
+    x2, y2 = objetivo
+    return abs(x1 - x2) + abs(y1 - y2)
+
+def a_star_search(mapa, inicio, objetivo):
+    # Cola de prioridad para nodos a explorar, comenzando con el nodo de inicio
+    cola_prioridad = []
+    heapq.heappush(cola_prioridad, (0, inicio))
+    
+    # Diccionarios para almacenar los costos y el camino
+    costo_aqui = {inicio: 0}
+    came_from = {inicio: None}
+
+    while cola_prioridad:
+        # Nodo con el menor costo f(n)
+        _, nodo_actual = heapq.heappop(cola_prioridad)
+
+        # Si hemos llegado al objetivo, reconstruimos el camino
+        if nodo_actual == objetivo:
+            camino = []
+            while nodo_actual:
+                camino.append(nodo_actual)
+                nodo_actual = came_from[nodo_actual]
+            return camino[::-1]  # Devuelve el camino en orden
+
+        # Explorar los vecinos del nodo actual
+        for vecino in mapa[nodo_actual]:
+            costo_nuevo = costo_aqui[nodo_actual] + mapa[nodo_actual][vecino]
+
+            # Si encontramos un camino más barato hacia el vecino
+            if vecino not in costo_aqui or costo_nuevo < costo_aqui[vecino]:
+                costo_aqui[vecino] = costo_nuevo
+                prioridad = costo_nuevo + heuristica(vecino, objetivo)
+                heapq.heappush(cola_prioridad, (prioridad, vecino))
+                came_from[vecino] = nodo_actual
+
+    return None  # Si no se encuentra el objetivo
+
+# Ejemplo de mapa de una ciudad con distancias entre puntos (nodos)
+mapa_ciudad = {
+    'A': {'B': 1, 'C': 4},
+    'B': {'A': 1, 'D': 2, 'E': 5},
+    'C': {'A': 4, 'F': 3},
+    'D': {'B': 2, 'E': 1},
+    'E': {'B': 5, 'D': 1, 'F': 2},
+    'F': {'C': 3, 'E': 2}
+}
+
+# Definir el punto de inicio y destino
+inicio = 'A'
+objetivo = 'F'
+
+# Ejecutar la búsqueda A*
+camino_mas_corto = a_star_search(mapa_ciudad, inicio, objetivo)
+
+if camino_mas_corto:
+    print(f"El camino más corto es: {camino_mas_corto}")
+else:
+    print("No se encontró un camino.")
