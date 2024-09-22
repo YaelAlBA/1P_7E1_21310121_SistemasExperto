@@ -1,0 +1,64 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+
+import os
+
+# Cargar o crear la base de conocimiento desde un archivo
+def cargar_conocimiento():
+    base_conocimiento = {}
+    
+    if os.path.exists("conocimiento.txt"):
+        with open("conocimiento.txt", "r") as archivo:
+            for linea in archivo:
+                if "::" in linea:
+                    pregunta, respuesta = linea.strip().split("::")
+                    base_conocimiento[pregunta] = respuesta
+    return base_conocimiento
+
+# Guardar la nueva pregunta y respuesta en el archivo
+def guardar_conocimiento(pregunta, respuesta):
+    with open("conocimiento.txt", "a") as archivo:
+        archivo.write(f"{pregunta}::{respuesta}\n")
+
+# Función del chatbot
+def chatbot(pregunta, base_conocimiento):
+    pregunta = pregunta.lower()
+    
+    # Verificar si la pregunta está en la base de conocimiento
+    if pregunta in base_conocimiento:
+        return base_conocimiento[pregunta]
+    else:
+        # Si no se conoce la respuesta, pedirla al usuario
+        nueva_respuesta = input(f"No conozco la respuesta para '{pregunta}'. ¿Cómo debería responder a eso? ")
+        
+        # Actualizar la base de conocimiento en memoria
+        base_conocimiento[pregunta] = nueva_respuesta
+        
+        # Guardar la nueva pregunta y respuesta en el archivo
+        guardar_conocimiento(pregunta, nueva_respuesta)
+        print("Gracias, he aprendido algo nuevo.")
+        return nueva_respuesta
+
+# Interfaz simple de chat
+def iniciar_chat():
+    base_conocimiento = cargar_conocimiento()
+    print("¡Hola! Soy tu chatbot. Pregúntame algo.")
+    
+    while True:
+        pregunta = input("Tú: ")
+        
+        if pregunta.lower() == "salir":
+            print("¡Adiós! Hasta la próxima.")
+            break
+        
+        respuesta = chatbot(pregunta, base_conocimiento)
+        print("Chatbot:", respuesta)
+
+# Iniciar el chat
+iniciar_chat()
+
