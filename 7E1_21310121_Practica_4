@@ -1,0 +1,132 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+
+import random
+
+# Datos del juego
+personajes = ["Drácula", "La Momia", "La Cazadora de Cazadores", "Frankenstein", "La Novia de Frankenstein"]
+locaciones = ["Castillo Encantado", "Tumba Abandonada", "Laboratorio del Dr. Frankenstein", "Bosque Tenebroso", "Cementerio"]
+armas = ["Estaca de Madera", "Veneno", "Hacha", "Daga de Plata", "Cadenas"]
+
+# Historias definidas con pistas ambiguas
+historias = {
+    0: (
+        "Una noche oscura en un lugar donde las sombras parecen cobrar vida, los cinco personajes se reunieron para discutir sus secretos. "
+        "Mientras conversaban, un grito resonó. La Cazadora de Cazadores había desaparecido misteriosamente. "
+        "La Momia, inquieta, sugirió que alguien la había atrapado, pero los otros comenzaron a murmurar entre sí. "
+        "Drácula, al verse señalado, defendió que fue un accidente, aunque el ambiente cargado de tensión no lo favorecía. "
+        "Entre susurros, se mencionó a Frankenstein, quien podría haber utilizado algo afilado. "
+        "La Novia de Frankenstein, sintiéndose traicionada, afirmó que había visto a La Cazadora sosteniendo una sustancia letal en la mano."
+    ),
+    1: (
+        "En una noche fría, los cinco personajes se encontraron bajo la luz de una luna espectral. "
+        "La Momia advirtió sobre la maldición que caería sobre ellos si no hablaban con sinceridad. "
+        "De repente, un fuerte estruendo interrumpió la noche y La Cazadora de Cazadores yacía en el suelo, inconsciente. "
+        "Frankenstein miró nerviosamente a Drácula, quien había estado cerca con una herramienta pesada en su mano. "
+        "Sin embargo, La Novia de Frankenstein soltó una risa nerviosa, sugiriendo que la Momia había utilizado un veneno ancestral. "
+        "Las miradas se cruzaron, y todos dudaban de la inocencia del otro."
+    ),
+    2: (
+        "Era una noche sombría en un bosque cubierto de niebla, donde los cinco personajes se reunieron para realizar un ritual extraño. "
+        "De repente, un grito desgarrador resonó entre los árboles. La Cazadora de Cazadores había caído. "
+        "La Momia, con su voz fría, mencionó haber visto a Drácula con un objeto contundente. "
+        "Frankenstein, sintiéndose culpable, negó su implicación, pero La Novia de Frankenstein empezó a dudar de su inocencia. "
+        "Las sombras danzaban alrededor, y el eco de un metal afilado resonaba en la oscuridad. "
+        "Las acusaciones volaron, y la verdad se volvía cada vez más borrosa."
+    ),
+    3: (
+        "En un lugar donde la ciencia se encuentra con lo sobrenatural, los personajes se reunieron bajo un ambiente tenso. "
+        "De repente, un grito resonó. La Cazadora de Cazadores fue encontrada herida, y la confusión reinó. "
+        "La Momia, al ver un objeto afilado en el suelo, murmuró sobre un antiguo ritual que nadie entendía. "
+        "Frankenstein, con el rostro pálido, intentó defenderse, pero La Novia de Frankenstein lo acusó de haber traído algo pesado y contundente. "
+        "Nadie sabía realmente qué había sucedido, y la sombra de la duda cayó sobre todos."
+    ),
+    4: (
+        "En un lugar lleno de misterio y sombras, los cinco personajes se reunieron bajo la niebla. "
+        "De repente, un grito cortó el aire y todos se volvieron. La Cazadora de Cazadores estaba herida. "
+        "Drácula, cerca de la escena, no pudo evitar ser acusado por La Momia, quien tenía sus propios secretos. "
+        "Frankenstein trató de proteger a su amigo, sugiriendo que La Novia de Frankenstein había estado demasiado cerca. "
+        "La atmósfera se volvió opresiva, y un objeto punzante apareció entre los escombros, dejando a todos en un estado de confusión. "
+        "Con cada acusación, el verdadero culpable parecía hundirse más en las sombras."
+    )
+}
+
+# Elegir aleatoriamente un índice de la historia
+index = random.randint(0, 4)
+culpable_idx = index
+arma_idx = index
+locacion_idx = index
+
+# Determinar la historia basada en el índice
+historia = historias.get(index)
+
+# Introducción
+print("¡Bienvenido al juego de misterio de terror!")
+print("Un crimen ha ocurrido, y tú eres el detective encargado de resolverlo.")
+print("A continuación, se te dará una historia que contiene pistas sobre quién es el culpable, con qué arma y en qué locación.\n")
+
+# Mostrar la historia completa
+print(historia)
+
+# Pistas finales
+print("\nPistas finales:")
+print(f"El culpable es uno de estos personajes: {', '.join(personajes)}.")
+print(f"El arma utilizada es una de estas: {', '.join(armas)}.")
+print(f"La locación del crimen es uno de estos lugares: {', '.join(locaciones)}.")
+
+print("\n¡Buena suerte resolviendo el misterio!\n")
+
+# Ciclo del juego
+while True:
+    # Pedir al jugador que adivine el culpable
+    print("\nOpciones de personajes:")
+    for idx, personaje in enumerate(personajes):
+        print(f"{idx + 1}. {personaje}")
+    culpable_adivinado = input("¿Quién crees que es el culpable? (Ingresa el número): ")
+
+    # Pedir al jugador que adivine el arma
+    print("\nOpciones de armas:")
+    for idx, arma in enumerate(armas):
+        print(f"{idx + 1}. {arma}")
+    arma_adivinada = input("¿Qué arma crees que se utilizó? (Ingresa el número): ")
+
+    # Pedir al jugador que adivine la locación
+    print("\nOpciones de locaciones:")
+    for idx, locacion in enumerate(locaciones):
+        print(f"{idx + 1}. {locacion}")
+    locacion_adivinada = input("¿Qué locación crees que se utilizó? (Ingresa el número): ")
+
+    # Convertir las respuestas a índices
+    try:
+        culpable_adivinado = int(culpable_adivinado) - 1
+        arma_adivinada = int(arma_adivinada) - 1
+        locacion_adivinada = int(locacion_adivinada) - 1
+
+        # Resultados finales
+        print("\n¡Resultados finales!")
+        print(f"Culpable: {personajes[culpable_idx]}")
+        print(f"Arma: {armas[arma_idx]}")
+        print(f"Locación: {locaciones[locacion_idx]}")
+        print(f"Historia: {historia}")
+
+        # Evaluar la respuesta del jugador
+        if (culpable_adivinado == culpable_idx and
+            arma_adivinada == arma_idx and
+            locacion_adivinada == locacion_idx):
+            print("¡Felicidades! Has resuelto el misterio correctamente.")
+        else:
+            print("Lo siento, no has acertado. Intenta de nuevo.")
+
+    except (ValueError, IndexError):
+        print("Entrada inválida. Por favor, ingresa un número válido.")
+
+    # Preguntar al jugador si quiere jugar de nuevo
+    jugar_nuevamente = input("\n¿Quieres jugar de nuevo? (s/n): ").strip().lower()
+    if jugar_nuevamente != 's':
+        print("Gracias por jugar. ¡Hasta la próxima!")
+        break
