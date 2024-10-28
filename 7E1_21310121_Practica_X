@@ -1,0 +1,82 @@
+class Akinator:
+    def __init__(self):
+        self.questions = [
+            "¿Es un animal?",
+            "¿Es un mamífero?",
+            "¿Vive en el agua?",
+            "¿Es un ave?",
+            "¿Es un reptil?",
+            "¿Es doméstico?",
+            "¿Es grande?",
+            "¿Puede volar?",
+            "¿Es carnívoro?",
+            "¿Es un insecto?",
+        ]
+        self.animals = {
+            "perro": ["Sí", "Sí", "No", "No", "No", "Sí", "Sí", "No", "Sí", "No"],
+            "gato": ["Sí", "Sí", "No", "No", "No", "Sí", "No", "No", "Sí", "No"],
+            "pez": ["Sí", "No", "Sí", "No", "No", "No", "No", "No", "No", "No"],
+            "águila": ["Sí", "No", "No", "Sí", "No", "No", "Sí", "Sí", "No", "No"],
+            "cocodrilo": ["Sí", "No", "Sí", "No", "Sí", "No", "Grande", "No", "Sí", "No"],
+            "elefante": ["Sí", "Sí", "No", "No", "No", "Sí", "Sí", "No", "No", "No"],
+            "serpiente": ["Sí", "No", "No", "No", "Sí", "No", "No", "No", "No", "No"],
+            "canario": ["Sí", "No", "No", "Sí", "No", "Sí", "No", "Sí", "No", "No"],
+            "caballo": ["Sí", "Sí", "No", "No", "No", "Sí", "Sí", "No", "No", "No"],
+            "gallina": ["Sí", "No", "No", "Sí", "No", "Sí", "No", "Sí", "No", "No"],
+            "abeja": ["Sí", "No", "No", "No", "No", "No", "No", "No", "No", "Sí"],
+            "tortuga": ["Sí", "No", "No", "No", "Sí", "No", "No", "No", "No", "No"],
+            "conejo": ["Sí", "Sí", "No", "No", "No", "Sí", "No", "No", "No", "No"],  # No es carnívoro
+            "pato": ["Sí", "No", "No", "Sí", "No", "Sí", "No", "Sí", "No", "No"],
+            "liebre": ["Sí", "Sí", "No", "No", "No", "No", "No", "No", "No", "No"],
+            "loro": ["Sí", "No", "No", "Sí", "No", "No", "No", "Sí", "No", "No"],
+            "pez payaso": ["Sí", "No", "Sí", "No", "No", "No", "No", "No", "No", "No"],
+            "puma": ["Sí", "Sí", "No", "No", "No", "No", "Grande", "No", "Sí", "No"],
+        }
+
+    def ask_questions(self):
+        answers = []
+        for question in self.questions:
+            while True:
+                answer = input(question + " (Sí/No/Tal vez): ").strip().lower()
+                if answer in ["sí", "si", "no", "tal vez"]:
+                    answers.append(answer)
+                    break
+                else:
+                    print("Por favor, responde solo con 'Sí', 'No' o 'Tal vez'.")
+        return answers
+
+    def guess_animal(self, answers):
+        # Normalizar las respuestas a "Sí", "No" o "Tal vez"
+        normalized_answers = ["Sí" if ans in ["sí", "si"] else "No" if ans == "no" else "Tal vez" for ans in answers]
+        for animal, animal_answers in self.animals.items():
+            if animal_answers == normalized_answers:
+                return animal
+        return None  # Devuelve None si no encuentra coincidencias
+
+    def ask_additional_questions(self):
+        print("No puedo adivinar. ¿Puedes ayudarme a aprender?")
+        new_animal = input("¿Cuál es el animal en el que pensabas? ")
+        new_answers = []
+        for question in self.questions:
+            while True:
+                answer = input(question + " (Sí/No/Tal vez): ").strip().lower()
+                if answer in ["sí", "si", "no", "tal vez"]:
+                    new_answers.append(answer)
+                    break
+                else:
+                    print("Por favor, responde solo con 'Sí', 'No' o 'Tal vez'.")
+        self.animals[new_animal] = new_answers
+        print(f"He aprendido sobre el {new_animal}.")
+
+    def play(self):
+        print("¡Piensa en un animal y yo intentaré adivinarlo!")
+        answers = self.ask_questions()
+        result = self.guess_animal(answers)
+        if result:
+            print("Creo que el animal en el que estás pensando es:", result)
+        else:
+            self.ask_additional_questions()
+
+if __name__ == "__main__":
+    game = Akinator()
+    game.play()
