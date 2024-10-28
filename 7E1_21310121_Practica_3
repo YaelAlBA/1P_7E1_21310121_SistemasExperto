@@ -1,3 +1,10 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
 class Akinator:
     def __init__(self):
         self.questions = [
