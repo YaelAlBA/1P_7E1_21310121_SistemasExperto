@@ -1,0 +1,55 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+
+import sqlite3
+
+# Crear y poblar la base de datos
+def configurar_base_datos():
+    conexion = sqlite3.connect('sistema_experto.db')
+    cursor = conexion.cursor()
+    
+    # Crear tablas
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS enfermedades (
+            id_enfermedad INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sintomas (
+            id_sintoma INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reglas (
+            id_regla INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_enfermedad INTEGER,
+            id_sintoma INTEGER,
+            FOREIGN KEY (id_enfermedad) REFERENCES enfermedades(id_enfermedad),
+            FOREIGN KEY (id_sintoma) REFERENCES sintomas(id_sintoma)
+        )
+    ''')
+    
+    # Poblar tablas con datos de ejemplo
+    enfermedades = [('Gripe',), ('COVID-19',)]
+    sintomas = [('fiebre',), ('tos',), ('dolor de cabeza',), ('cansancio',)]
+    reglas = [
+        (1, 1), (1, 2), (1, 3),  # Gripe: fiebre, tos, dolor de cabeza
+        (2, 1), (2, 2), (2, 4)   # COVID-19: fiebre, tos, cansancio
+    ]
+    
+    cursor.executemany('INSERT OR IGNORE INTO enfermedades (nombre) VALUES (?)', enfermedades)
+    cursor.executemany('INSERT OR IGNORE INTO sintomas (nombre) VALUES (?)', sintomas)
+    cursor.executemany('INSERT OR IGNORE INTO reglas (id_enfermedad, id_sintoma) VALUES (?, ?)', reglas)
+    
+    conexion.commit()
+    conexion.close()
+
+# Configurar la base de datos al inicio
+configurar_base_datos()
