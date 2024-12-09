@@ -1,0 +1,23 @@
+def diagnosticar(sintomas_usuario):
+    conexion = sqlite3.connect('sistema_experto.db')
+    cursor = conexion.cursor()
+
+    # Obtener enfermedades y sus síntomas relacionados
+    cursor.execute('''
+        SELECT enfermedades.nombre, GROUP_CONCAT(sintomas.nombre) AS sintomas
+        FROM reglas
+        JOIN enfermedades ON reglas.id_enfermedad = enfermedades.id_enfermedad
+        JOIN sintomas ON reglas.id_sintoma = sintomas.id_sintoma
+        GROUP BY enfermedades.nombre
+    ''')
+    enfermedades = cursor.fetchall()
+    conexion.close()
+    
+    diagnostico = []
+    for enfermedad, sintomas in enfermedades:
+        sintomas_asociados = sintomas.split(",")
+        coincidencias = set(sintomas_usuario) & set(sintomas_asociados)
+        if len(coincidencias) / len(sintomas_asociados) >= 0.5:  # Umbral del 50%
+            diagnostico.append(enfermedad)
+
+    return diagnostico
