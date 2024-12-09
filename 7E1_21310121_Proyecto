@@ -1,0 +1,172 @@
+"""
+Sistemas Expertos
+Alumno:Yael Alejandro Aldna Barajas 
+Registro: 21310121
+Grupo: 7E1
+Profesor: Mauricio Alejandro Cabrera Arellano
+"""
+import sqlite3
+
+# Crear y poblar la base de datos
+def configurar_base_datos():
+    conexion = sqlite3.connect('sistema_experto.db')
+    cursor = conexion.cursor()
+    
+    # Crear tablas
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS enfermedades (
+            id_enfermedad INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sintomas (
+            id_sintoma INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reglas (
+            id_regla INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_enfermedad INTEGER,
+            id_sintoma INTEGER,
+            FOREIGN KEY (id_enfermedad) REFERENCES enfermedades(id_enfermedad),
+            FOREIGN KEY (id_sintoma) REFERENCES sintomas(id_sintoma)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS medicinas (
+            id_medicina INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_enfermedad INTEGER,
+            nombre TEXT NOT NULL,
+            FOREIGN KEY (id_enfermedad) REFERENCES enfermedades(id_enfermedad)
+        )
+    ''')
+    
+    # Poblar tablas con datos de ejemplo
+    enfermedades = [
+        ('Gripe',), 
+        ('COVID-19',), 
+        ('Alergia Estacional',), 
+        ('Migraña',),
+        ('Dengue',),
+        ('Amigdalitis',),
+        ('Sinusitis',),
+        ('Bronquitis',)
+    ]
+    sintomas = [
+        ('fiebre',), 
+        ('tos',), 
+        ('dolor de cabeza',), 
+        ('cansancio',), 
+        ('estornudos',),
+        ('congestión nasal',), 
+        ('náuseas',),
+        ('dolor muscular',),
+        ('dolor de garganta',),
+        ('dificultad para respirar',),
+        ('pérdida del olfato',),
+        ('ojos llorosos',),
+        ('sarpullido',)
+    ]
+    reglas = [
+        (1, 1), (1, 2), (1, 3), 
+        (2, 1), (2, 2), (2, 4), (2, 10), (2, 11),
+        (3, 5), (3, 6), (3, 12),
+        (4, 3), (4, 7),
+        (5, 1), (5, 3), (5, 8), (5, 13),
+        (6, 1), (6, 9), (6, 2),
+        (7, 3), (7, 6), (7, 5),
+        (8, 2), (8, 4), (8, 10)
+    ]
+    medicinas = [
+        (1, 'Paracetamol'), (1, 'Antigripales'),
+        (2, 'Ibuprofeno'), (2, 'Antiviral'),
+        (3, 'Antihistamínicos'), (3, 'Descongestionantes'),
+        (4, 'Analgésicos'), (4, 'Cafeína'),
+        (5, 'Acetaminofén'), (5, 'Líquidos abundantes'),
+        (6, 'Antibióticos'), (6, 'Gárgaras de agua salada'),
+        (7, 'Spray nasal'), (7, 'Analgésicos'),
+        (8, 'Broncodilatadores'), (8, 'Mucolíticos')
+    ]
+    
+    cursor.executemany('INSERT OR IGNORE INTO enfermedades (nombre) VALUES (?)', enfermedades)
+    cursor.executemany('INSERT OR IGNORE INTO sintomas (nombre) VALUES (?)', sintomas)
+    cursor.executemany('INSERT OR IGNORE INTO reglas (id_enfermedad, id_sintoma) VALUES (?, ?)', reglas)
+    cursor.executemany('INSERT OR IGNORE INTO medicinas (id_enfermedad, nombre) VALUES (?, ?)', medicinas)
+    
+    conexion.commit()
+    conexion.close()
+
+# Motor de inferencia
+def diagnosticar(sintomas_usuario):
+    conexion = sqlite3.connect('sistema_experto.db')
+    cursor = conexion.cursor()
+
+    # Obtener enfermedades y sus síntomas relacionados
+    cursor.execute('''
+        SELECT enfermedades.id_enfermedad, enfermedades.nombre, GROUP_CONCAT(sintomas.nombre) AS sintomas
+        FROM reglas
+        JOIN enfermedades ON reglas.id_enfermedad = enfermedades.id_enfermedad
+        JOIN sintomas ON reglas.id_sintoma = sintomas.id_sintoma
+        GROUP BY enfermedades.id_enfermedad, enfermedades.nombre
+    ''')
+    enfermedades = cursor.fetchall()
+    
+    diagnostico = []
+    for id_enfermedad, enfermedad, sintomas in enfermedades:
+        sintomas_asociados = sintomas.split(",")
+        coincidencias = set(sintomas_usuario) & set(sintomas_asociados)
+        if len(coincidencias) / len(sintomas_asociados) >= 0.5:  # Umbral del 50%
+            diagnostico.append((id_enfermedad, enfermedad))
+    
+    # Obtener medicinas recomendadas para las enfermedades diagnosticadas
+    resultado = []
+    for id_enfermedad, enfermedad in diagnostico:
+        cursor.execute('''
+            SELECT nombre FROM medicinas WHERE id_enfermedad = ?
+        ''', (id_enfermedad,))
+        medicinas = [m[0] for m in cursor.fetchall()]
+        resultado.append((enfermedad, medicinas))
+    
+    conexion.close()
+    return resultado
+
+# Interfaz en consola
+def iniciar_sistema():
+    conexion = sqlite3.connect('sistema_experto.db')
+    cursor = conexion.cursor()
+    
+    # Obtener todos los síntomas disponibles
+    cursor.execute('SELECT nombre FROM sintomas')
+    sintomas_disponibles = [s[0] for s in cursor.fetchall()]
+    conexion.close()
+    
+    print("Bienvenido al sistema experto médico")
+    print("Por favor selecciona tus síntomas:")
+    for i, sintoma in enumerate(sintomas_disponibles, start=1):
+        print(f"{i}. {sintoma}")
+    
+    seleccion = input("Ingresa los números de los síntomas separados por comas: ")
+    seleccion_indices = [int(i) - 1 for i in seleccion.split(",") if i.isdigit()]
+    sintomas_usuario = [sintomas_disponibles[i] for i in seleccion_indices if i < len(sintomas_disponibles)]
+    
+    if not sintomas_usuario:
+        print("No seleccionaste ningún síntoma válido.")
+        return
+    
+    print("\nDiagnóstico en proceso...\n")
+    diagnostico = diagnosticar(sintomas_usuario)
+    
+    if diagnostico:
+        print("Posibles diagnósticos y medicinas recomendadas:")
+        for enfermedad, medicinas in diagnostico:
+            print(f"- {enfermedad}")
+            print(f"  Medicinas sugeridas: {', '.join(medicinas) if medicinas else 'No hay medicinas sugeridas'}")
+    else:
+        print("No se encontraron diagnósticos con los síntomas proporcionados.")
+
+# Configurar base de datos e iniciar el sistema
+if __name__ == '__main__':
+    configurar_base_datos()
+    iniciar_sistema()
